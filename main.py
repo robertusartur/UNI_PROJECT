@@ -29,7 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:1234@localhost/postgres7"
+SQLALCHEMY_DATABASE_URL = "postgresql://test_x95y_user:vJBljgKdl4oJujHfKMJ0VCu6GcyBzCqT@dpg-cpe3jp7109ks73ep4jng-a/test_x95y"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
