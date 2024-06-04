@@ -95,9 +95,11 @@ class NotificationORM(Base):
     __tablename__ = 'notifications'
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"))
-    content = Column(Text)
+    title = Column(String)
+    text = Column(Text)
     read = Column(Boolean, default=False)
     user = relationship("UserORM", back_populates="notifications")
+
 
 class MessageORM(Base):
     __tablename__ = 'messages'
@@ -229,6 +231,17 @@ class UserAdsResponse(BaseModel):
 
 class AdIdRequest(BaseModel):
     ad_id: int
+
+class NotificationCreateRequest(BaseModel):
+    title: str
+    text: str
+
+class NotificationResponse(BaseModel):
+    id: int
+    title: str
+    text: str
+    read: bool
+
 # Utility functions
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
@@ -1050,6 +1063,38 @@ async def send_message(
         timestamp=new_message.timestamp,
         dialogue_name=new_message.dialogue_name
     )
+
+@app.post("/user/{user_id}/notifications", response_model=NotificationResponse)
+async def create_notification(
+    user_id: int,
+    notification_data: NotificationCreateRequest,
+    db: Session = Depends(get_session_local),
+    current_user: UserORM = Depends(get_current_user)
+):
+    # Проверка наличия пользователя
+    user = db.query(UserORM).filter(UserORM.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден")
+
+    # Создание нового уведомления
+    new_notification = NotificationORM(
+        user_id=user_id,
+        title=notification_data.title,
+        text=notification_data.text,
+        read=False
+    )
+
+    db.add(new_notification)
+    db.commit()
+    db.refresh(new_notification)
+
+    return NotificationResponse(
+        id=new_notification.id,
+        title=new_notification.title,
+        text=new_notification.text,
+        read=new_notification.read
+    )
+
 
 # Testing endpoint
 @app.get("/")
