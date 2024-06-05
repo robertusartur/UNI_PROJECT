@@ -23,10 +23,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=['*'],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=['*'],
+    allow_headers=['*'],
 )
 
 SQLALCHEMY_DATABASE_URL = "postgresql://test_x95y_user:vJBljgKdl4oJujHfKMJ0VCu6GcyBzCqT@dpg-cpe3jp7109ks73ep4jng-a/test_x95y"
